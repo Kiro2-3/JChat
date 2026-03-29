@@ -1,7 +1,7 @@
 package com.jchat;
 
 import com.gluonhq.attach.storage.StorageService;
-import com.gluonhq.attach.storage.StorageServiceFactory;
+import com.gluonhq.attach.util.Services;
 
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -11,17 +11,19 @@ import java.sql.Statement;
 
 public class DatabaseManager {
     private static final String DB_NAME = "jchat.db";
-    private static String dbPath;
+    private static Path dbPath;
 
     static {
-        StorageService storageService = StorageServiceFactory.create();
-        Path basePath = storageService != null ? storageService.getPrivateStorage() : Path.of(System.getProperty("user.home"));
-        dbPath = basePath.resolve(DB_NAME).toString();
+        dbPath = Services.get(StorageService.class)
+                .flatMap(StorageService::getPrivateStorage)
+                .map(java.io.File::toPath)
+                .orElseGet(() -> Path.of(System.getProperty("user.home")))
+                .resolve(DB_NAME);
         initializeDatabase();
     }
 
     private static void initializeDatabase() {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbPath)) {
+        try (Connection conn = getConnection()) {
             try (Statement stmt = conn.createStatement()) {
                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, sender TEXT, content TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)");
             }
@@ -31,6 +33,6 @@ public class DatabaseManager {
     }
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:sqlite:" + dbPath);
+        return DriverManager.getConnection("jdbc:sqlite:" + dbPath.toString());
     }
 }

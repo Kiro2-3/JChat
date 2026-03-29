@@ -11,11 +11,18 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>21</java.version>
-        <javafx.version>26</javafx.version>
+        <javafx.version>21.0.2</javafx.version>
         <gluonfx.plugin.version>1.0.28</gluonfx.plugin.version>
         <glisten.version>6.0.0</glisten.version>
-        <sqlite.jdbc.version>3.51.0</sqlite.jdbc.version>
+        <sqlite.jdbc.version>3.45.1.0</sqlite.jdbc.version>
+        <attach.version>4.0.20</attach.version>
     </properties>
+        <repositories>
+            <repository>
+                <id>gluon-releases</id>
+                <url>https://nexus.gluonhq.com/nexus/content/repositories/releases/</url>
+            </repository>
+        </repositories>
     <dependencies>
         <!-- JavaFX -->
         <dependency>
@@ -31,14 +38,19 @@
         <!-- Gluon Glisten -->
         <dependency>
             <groupId>com.gluonhq</groupId>
-            <artifactId>glisten-afterburner</artifactId>
-            <version>${glisten.version}</version>
+            <artifactId>charm-glisten</artifactId>
+            <version>6.0.0</version>
         </dependency>
         <!-- Gluon Attach Storage (for cross-platform file paths) -->
         <dependency>
             <groupId>com.gluonhq.attach</groupId>
             <artifactId>storage</artifactId>
-            <version>4.0.16</version>
+            <version>${attach.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>util</artifactId>
+            <version>${attach.version}</version>
         </dependency>
         <!-- SQLite JDBC -->
         <dependency>
