@@ -86,9 +86,7 @@
                 <configuration>
                     <mainClass>com.jchat.Main</mainClass>
                     <attachList>
-                        <list>
-                            <attach>storage</attach>
-                        </list>
+                        <list>storage</list>
                     </attachList>
                 </configuration>
             </plugin>
