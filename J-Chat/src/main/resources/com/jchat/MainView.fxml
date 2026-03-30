@@ -1,14 +1,16 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 <?import com.gluonhq.charm.glisten.control.AppBar?>
-<VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jchat.ChatController" spacing="0" fillWidth="true">
+<VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jchat.ChatController" spacing="0" fillWidth="true" style="-fx-background-color: #f4f6fb;">
     <children>
         <AppBar fx:id="appBar" />
-        <ListView fx:id="messagesListView" VBox.vgrow="ALWAYS" />
-        <HBox spacing="5" padding="10">
-            <TextField fx:id="messageField" HBox.hgrow="ALWAYS" promptText="Type a message..." />
-            <Button text="Send" onAction="#onSend" />
+        <ListView fx:id="messagesListView" VBox.vgrow="ALWAYS" style="-fx-background-radius: 12; -fx-background-color: #ffffff; -fx-padding: 10; -fx-border-color: #e0e0e0; -fx-border-radius: 12;" />
+        <HBox spacing="10" padding="15" style="-fx-background-color: #ffffff; -fx-background-radius: 0 0 12 12; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;">
+            <TextField fx:id="messageField" HBox.hgrow="ALWAYS" promptText="Type a message..." style="-fx-background-radius: 20; -fx-background-color: #f0f2f5; -fx-border-color: #cccccc; -fx-border-radius: 20; -fx-padding: 8 16;" />
+            <Button text="Send" onAction="#onSend" style="-fx-background-color: #1976d2; -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 8 24; -fx-font-weight: bold;" />
         </HBox>
     </children>
 </VBox>
