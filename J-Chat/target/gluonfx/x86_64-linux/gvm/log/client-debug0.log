@@ -1,0 +1,5 @@
+[Mon Mar 30 23:55:10 PST 2026][INFO] ==================== LINK TASK ====================
+[Mon Mar 30 23:55:10 PST 2026][FINE] Looking for resource: /native/linux/launcher.c
+[Mon Mar 30 23:55:10 PST 2026][FINE] PB Command for compile-additional-sources: gcc -c -DSUBSTRATE -I/home/raki/graalvm/include -I/home/raki/graalvm/include/linux -DGVM_17 -I/home/raki/J-Chat/target/gluonfx/x86_64-linux/gvm/JChat launcher.c
+[Mon Mar 30 23:55:10 PST 2026][FINE] Start process compile-additional-sources...
+[Mon Mar 30 23:55:10 PST 2026][FINE] Result for compile-additional-sources: 0
