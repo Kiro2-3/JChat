@@ -14,6 +14,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import com.gluonhq.charm.glisten.control.AppBar;
+import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
+import com.gluonhq.charm.glisten.application.MobileApplication;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -30,12 +32,24 @@ public class ChatController {
     @FXML
     private AppBar appBar;
 
+    @FXML
+    private javafx.scene.layout.VBox mainView;
+
     private final ObservableList<Message> messages = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
+        // Handle Gluon View lifecycle to configure AppBar
+        Platform.runLater(() -> {
+            if (appBar != null) {
+                appBar.setTitleText("JChat");
+                appBar.setNavIcon(MaterialDesignIcon.MENU.button(e -> System.out.println("Menu clicked")));
+                appBar.getActionItems().add(MaterialDesignIcon.ACCOUNT_CIRCLE.button(e -> 
+                    MobileApplication.getInstance().switchView(Main.PROFILE_VIEW)));
+            }
+        });
+
         messagesListView.setItems(messages);
-        appBar.setTitleText("JChat");
         messagesListView.setCellFactory(list -> new ListCell<>() {
             private final HBox content;
             private final ImageView avatar;

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.gluonhq.charm.glisten.mvc.View?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.text.Text?>
+<?import javafx.geometry.Insets?>
+
+<View fx:id="profileView" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jchat.ProfileController" styleClass="profile-container" stylesheets="@style.css">
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+            <content>
+                <VBox alignment="TOP_CENTER" spacing="30" maxWidth="500">
+                    <padding>
+                        <Insets top="40" bottom="40" left="20" right="20" />
+                    </padding>
+                    <children>
+                        <!-- Profile Header -->
+                        <VBox alignment="CENTER" spacing="15">
+                            <StackPane styleClass="profile-image-container">
+                                <ImageView fx:id="profileImageView" fitHeight="120" fitWidth="120" pickOnBounds="true" preserveRatio="true" />
+                            </StackPane>
+                            <VBox alignment="CENTER" spacing="5">
+                                <Label fx:id="usernameLabel" styleClass="profile-name" />
+                                <Label fx:id="emailLabel" styleClass="profile-email" />
+                            </VBox>
+                        </VBox>
+
+                        <!-- Profile Info -->
+                        <VBox spacing="20" styleClass="profile-card">
+                            <VBox spacing="10">
+                                <Label text="About Me" styleClass="section-header" />
+                                <Label fx:id="bioLabel" wrapText="true" styleClass="profile-bio" />
+                            </VBox>
+
+                            <Separator />
+
+                            <VBox spacing="15">
+                                <HBox alignment="CENTER_LEFT" spacing="15">
+                                    <Label text="Location" styleClass="info-label" minWidth="80" />
+                                    <Label text="New York, USA" styleClass="info-value" />
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT" spacing="15">
+                                    <Label text="Joined" styleClass="info-label" minWidth="80" />
+                                    <Label text="January 2024" styleClass="info-value" />
+                                </HBox>
+                            </VBox>
+                        </VBox>
+
+                        <!-- Actions -->
+                        <VBox spacing="15" maxWidth="Infinity">
+                            <Button text="Edit Profile" onAction="#onEditProfile" maxWidth="Infinity" styleClass="primary-button" />
+                            <Button text="Logout" onAction="#onLogout" maxWidth="Infinity" styleClass="secondary-button" />
+                        </VBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</View>

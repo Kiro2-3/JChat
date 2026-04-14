@@ -109,3 +109,83 @@
 .check-box:selected .box {
     -fx-background-color: #4f46e5;
 }
+
+/* Profile Page */
+.profile-container {
+    -fx-background-color: #f9fafb;
+}
+
+.profile-image-container {
+    -fx-background-color: white;
+    -fx-padding: 4;
+    -fx-background-radius: 64;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 4);
+}
+
+.profile-name {
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+    -fx-fill: #111827;
+}
+
+.profile-email {
+    -fx-font-size: 14px;
+    -fx-fill: #6b7280;
+}
+
+.profile-card {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-padding: 24;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 8, 0, 0, 2);
+}
+
+.section-header {
+    -fx-font-size: 16px;
+    -fx-font-weight: 700;
+    -fx-fill: #1f2937;
+}
+
+.profile-bio {
+    -fx-font-size: 14px;
+    -fx-fill: #4b5563;
+    -fx-line-spacing: 4;
+}
+
+.info-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-fill: #9ca3af;
+}
+
+.info-value {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-fill: #1f2937;
+}
+
+.primary-button {
+    -fx-background-color: #4f46e5;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-padding: 12 24;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+}
+
+.primary-button:hover {
+    -fx-background-color: #4338ca;
+}
+
+.secondary-button {
+    -fx-background-color: #fef2f2;
+    -fx-text-fill: #ef4444;
+    -fx-background-radius: 10;
+    -fx-padding: 12 24;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #fee2e2;
+}
