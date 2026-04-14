@@ -10,9 +10,21 @@ import javafx.stage.Stage;
 
 public class Main extends MobileApplication {
     public static final String MAIN_VIEW = "MainView";
+    public static final String LOGIN_VIEW = "LoginView";
 
     @Override
     public void init() {
+        addViewFactory(LOGIN_VIEW, () -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jchat/LoginView.fxml"));
+                Parent root = loader.load();
+                return new View(root);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new View();
+            }
+        });
+
         addViewFactory(MAIN_VIEW, () -> {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jchat/MainView.fxml"));
@@ -23,6 +35,12 @@ public class Main extends MobileApplication {
                 return new View();
             }
         });
+    }
+
+    @Override
+    public void postInit(Scene scene) {
+        super.postInit(scene);
+        switchView(LOGIN_VIEW);
     }
 
     public static void main(String[] args) {
