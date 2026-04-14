@@ -1,0 +1,111 @@
+.root {
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-accent: #4f46e5; /* Indigo 600 */
+}
+
+.login-container {
+    -fx-background-color: linear-gradient(to bottom right, #4f46e5, #7c3aed, #db2777);
+}
+
+.login-card {
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 24;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 30, 0, 0, 10);
+    -fx-padding: 40;
+}
+
+.logo-icon {
+    -fx-background-color: linear-gradient(to bottom right, #4f46e5, #7c3aed);
+    -fx-background-radius: 12;
+    -fx-min-width: 50;
+    -fx-min-height: 50;
+    -fx-max-width: 50;
+    -fx-max-height: 50;
+}
+
+.logo-text {
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+    -fx-fill: white;
+}
+
+.header-text {
+    -fx-font-size: 28px;
+    -fx-font-weight: 800;
+    -fx-fill: #1f2937; /* Gray 800 */
+}
+
+.sub-header-text {
+    -fx-font-size: 14px;
+    -fx-fill: #6b7280; /* Gray 500 */
+}
+
+.label-text {
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-fill: #374151; /* Gray 700 */
+}
+
+.text-input {
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #e5e7eb; /* Gray 200 */
+    -fx-background-color: #ffffff;
+    -fx-padding: 12 16;
+    -fx-font-size: 14px;
+    -fx-border-width: 1.5;
+}
+
+.text-input:focused {
+    -fx-border-color: #4f46e5;
+    -fx-effect: dropshadow(three-pass-box, rgba(79, 70, 229, 0.1), 8, 0, 0, 0);
+}
+
+.login-button {
+    -fx-background-color: linear-gradient(to right, #4f46e5, #7c3aed);
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-padding: 14;
+    -fx-font-weight: 800;
+    -fx-font-size: 16px;
+    -fx-cursor: hand;
+}
+
+.login-button:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(79, 70, 229, 0.4), 12, 0, 0, 4);
+}
+
+.login-button:pressed {
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+.error-label {
+    -fx-text-fill: #ef4444; /* Red 500 */
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+.hyperlink {
+    -fx-text-fill: #4f46e5;
+    -fx-font-weight: 700;
+    -fx-underline: false;
+    -fx-border-color: transparent;
+}
+
+.hyperlink:hover {
+    -fx-text-fill: #4338ca;
+    -fx-underline: true;
+}
+
+.check-box .box {
+    -fx-background-radius: 4;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #4f46e5;
+}
