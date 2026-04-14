@@ -42,10 +42,11 @@ public class ChatController {
         // Handle Gluon View lifecycle to configure AppBar
         Platform.runLater(() -> {
             if (appBar != null) {
-                appBar.setTitleText("JChat");
-                appBar.setNavIcon(MaterialDesignIcon.MENU.button(e -> System.out.println("Menu clicked")));
-                appBar.getActionItems().add(MaterialDesignIcon.ACCOUNT_CIRCLE.button(e -> 
-                    MobileApplication.getInstance().switchView(Main.PROFILE_VIEW)));
+                appBar.setTitleText("Chat");
+                appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> 
+                    MobileApplication.getInstance().switchView(Main.DASHBOARD_VIEW)));
+                appBar.getActionItems().clear();
+                appBar.getActionItems().add(MaterialDesignIcon.INFO.button(e -> System.out.println("Info clicked")));
             }
         });
 

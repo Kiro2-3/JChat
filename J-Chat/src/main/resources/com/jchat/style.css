@@ -189,3 +189,55 @@
 .secondary-button:hover {
     -fx-background-color: #fee2e2;
 }
+
+/* Dashboard & Contact List */
+.dashboard-container {
+    -fx-background-color: white;
+}
+
+.search-container {
+    -fx-background-color: #f9fafb;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 0 0 1 0;
+}
+
+.search-field {
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-background-color: white;
+    -fx-border-color: #e5e7eb;
+    -fx-padding: 8 15;
+}
+
+.contact-list {
+    -fx-background-color: white;
+}
+
+.contact-list .list-cell {
+    -fx-background-color: white;
+    -fx-border-color: #f3f4f6;
+    -fx-border-width: 0 0 1 0;
+}
+
+.contact-list .list-cell:hover {
+    -fx-background-color: #f9fafb;
+}
+
+.contact-list .list-cell:selected {
+    -fx-background-color: #f3f4f6;
+}
+
+.contact-name {
+    -fx-font-size: 16px;
+    -fx-font-weight: 700;
+    -fx-fill: #111827;
+}
+
+.contact-last-msg {
+    -fx-font-size: 13px;
+    -fx-fill: #6b7280;
+}
+
+.status-indicator {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 4, 0, 0, 1);
+}

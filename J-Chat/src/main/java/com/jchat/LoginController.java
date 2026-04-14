@@ -55,7 +55,7 @@ public class LoginController {
         }
 
         // For now, allow any non-empty credentials
-        MobileApplication.getInstance().switchView(Main.MAIN_VIEW);
+        MobileApplication.getInstance().switchView(Main.DASHBOARD_VIEW);
     }
 
     @FXML
