@@ -31,6 +31,8 @@ public class ChatController {
     private Button sendButton;
     @FXML
     private AppBar appBar;
+    @FXML
+    private HBox connectivityBar;
 
     @FXML
     private javafx.scene.layout.VBox mainView;
@@ -39,6 +41,12 @@ public class ChatController {
 
     @FXML
     public void initialize() {
+        // Connectivity Bar logic
+        if (connectivityBar != null) {
+            connectivityBar.visibleProperty().bind(NetworkService.getInstance().onlineProperty().not());
+            connectivityBar.managedProperty().bind(connectivityBar.visibleProperty());
+        }
+
         // Handle Gluon View lifecycle to configure AppBar
         Platform.runLater(() -> {
             if (appBar != null) {
@@ -59,6 +67,7 @@ public class ChatController {
             private final Text message;
             private final Text timestamp;
             private final javafx.scene.control.Label syncIcon;
+            private final javafx.scene.control.Button retryBtn;
             {
                 avatar = new ImageView();
                 avatar.setFitWidth(36);
@@ -78,7 +87,12 @@ public class ChatController {
                 syncIcon = new javafx.scene.control.Label();
                 syncIcon.setStyle("-fx-padding: 0 0 0 5;");
 
-                HBox footer = new HBox(timestamp, syncIcon);
+                retryBtn = new javafx.scene.control.Button("Retry");
+                retryBtn.getStyleClass().add("retry-button");
+                retryBtn.setVisible(false);
+                retryBtn.setManaged(false);
+
+                HBox footer = new HBox(timestamp, syncIcon, retryBtn);
                 footer.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
                 footer.setSpacing(5);
 
@@ -106,6 +120,8 @@ public class ChatController {
                     
                     SyncStatus status = item.getSyncStatus();
                     syncIcon.setGraphic(null);
+                    retryBtn.setVisible(false);
+                    retryBtn.setManaged(false);
                     
                     switch (status) {
                         case PENDING:
@@ -131,6 +147,9 @@ public class ChatController {
                             syncIcon.getGraphic().setStyle("-fx-fill: #F44336; -fx-font-size: 12px;");
                             vbox.setOpacity(0.5);
                             setTooltip(new javafx.scene.control.Tooltip("Failed: " + item.getLastError()));
+                            retryBtn.setVisible(true);
+                            retryBtn.setManaged(true);
+                            retryBtn.setOnAction(e -> retrySync(item.getId()));
                             break;
                     }
                     
@@ -156,6 +175,13 @@ public class ChatController {
             }
         });
         loadMessages();
+    }
+
+    private void retrySync(String messageId) {
+        new Thread(() -> {
+            SyncService.getInstance().retryTask(messageId);
+            Platform.runLater(this::loadMessages);
+        }).start();
     }
 
     @FXML

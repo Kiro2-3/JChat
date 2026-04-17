@@ -241,3 +241,23 @@
 .status-indicator {
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 4, 0, 0, 1);
 }
+
+.connectivity-bar {
+    -fx-background-color: #f59e0b; /* Amber 500 */
+    -fx-padding: 5 10;
+    -fx-alignment: center;
+}
+
+.connectivity-text {
+    -fx-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.retry-button {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+    -fx-padding: 2 6;
+    -fx-background-radius: 4;
+}

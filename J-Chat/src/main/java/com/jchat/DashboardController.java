@@ -24,6 +24,9 @@ public class DashboardController {
     @FXML
     private ListView<Contact> contactListView;
 
+    @FXML
+    private HBox connectivityBar;
+
     private final ObservableList<Contact> contacts = FXCollections.observableArrayList();
 
     private void loadContacts() {
@@ -36,6 +39,12 @@ public class DashboardController {
     }
 
     public void initialize() {
+        // Connectivity Bar logic
+        if (connectivityBar != null) {
+            connectivityBar.visibleProperty().bind(NetworkService.getInstance().onlineProperty().not());
+            connectivityBar.managedProperty().bind(connectivityBar.visibleProperty());
+        }
+
         // Initialize Services
         SyncService.getInstance(); 
 

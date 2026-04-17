@@ -55,6 +55,33 @@ public class SyncService {
         taskQueue.offer(task);
     }
 
+    public void retryTask(String entityId) {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM sync_queue WHERE entity_id = ?");
+            ps.setString(1, entityId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                SyncTask task = new SyncTask(
+                        rs.getInt("id"),
+                        rs.getString("entity_type"),
+                        rs.getString("entity_id"),
+                        rs.getString("operation"),
+                        rs.getString("payload"),
+                        0, // Reset retry count
+                        System.currentTimeMillis()
+                );
+                // Update DB as well
+                PreparedStatement psUpd = conn.prepareStatement("UPDATE sync_queue SET retry_count = 0, last_error = NULL WHERE id = ?");
+                psUpd.setInt(1, task.getQueueId());
+                psUpd.executeUpdate();
+                
+                addTask(task);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void loadPendingTasksFromDb() {
         try (Connection conn = DatabaseManager.getConnection()) {
             ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM sync_queue ORDER BY timestamp ASC");

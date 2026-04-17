@@ -17,11 +17,18 @@ public class MessageRepository {
     }
 
     public ObservableList<Message> getMessages() {
+        return getMessages(100, 0);
+    }
+
+    public ObservableList<Message> getMessages(int limit, int offset) {
         ObservableList<Message> messages = FXCollections.observableArrayList();
         try (Connection conn = DatabaseManager.getConnection()) {
-            ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM messages ORDER BY timestamp ASC");
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM messages ORDER BY timestamp DESC LIMIT ? OFFSET ?");
+            ps.setInt(1, limit);
+            ps.setInt(2, offset);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                messages.add(new Message(
+                messages.add(0, new Message( // Add at top for correct chat order
                         rs.getString("id"),
                         rs.getString("remote_id"),
                         rs.getString("sender"),

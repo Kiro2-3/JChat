@@ -13,6 +13,9 @@
     <center>
         <VBox spacing="0">
             <children>
+                <HBox fx:id="connectivityBar" styleClass="connectivity-bar" managed="false" visible="false">
+                    <Label text="Waiting for network..." styleClass="connectivity-text" />
+                </HBox>
                 <!-- Search Bar -->
                 <VBox styleClass="search-container">
                     <padding>
