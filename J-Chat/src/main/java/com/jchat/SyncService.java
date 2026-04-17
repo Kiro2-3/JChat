@@ -30,15 +30,19 @@ public class SyncService {
         }, 0, 10, TimeUnit.SECONDS);
     }
 
+    private static final int MAX_RETRIES = 3;
+
     private void syncMessages() {
         try (Connection conn = DatabaseManager.getConnection()) {
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM messages WHERE synced = 0");
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM messages WHERE synced = 0 AND retry_count < ?");
+            ps.setInt(1, MAX_RETRIES);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 String id = rs.getString("id");
                 String sender = rs.getString("sender");
                 String content = rs.getString("content");
                 String timestamp = rs.getString("timestamp");
+                int retryCount = rs.getInt("retry_count");
 
                 Message msg = new Message(id, null, sender, content, timestamp, null, false);
                 try {
@@ -46,7 +50,24 @@ public class SyncService {
                     updateMessageSyncStatus(id, remoteId);
                 } catch (Exception e) {
                     System.err.println("Failed to sync message " + id + ": " + e.getMessage());
+                    handleSyncFailure(id, e.getMessage(), retryCount + 1);
                 }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleSyncFailure(String localId, String errorMessage, int newRetryCount) {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement("UPDATE messages SET retry_count = ?, last_error = ? WHERE id = ?");
+            ps.setInt(1, newRetryCount);
+            ps.setString(2, errorMessage);
+            ps.setString(3, localId);
+            ps.executeUpdate();
+            
+            if (newRetryCount >= MAX_RETRIES) {
+                System.err.println("Message " + localId + " has reached max retries and will not be synced automatically.");
             }
         } catch (SQLException e) {
             e.printStackTrace();

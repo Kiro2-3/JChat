@@ -30,6 +30,12 @@ public class MockRemoteDataSource {
         if (!NetworkService.getInstance().isOnline()) {
             throw new Exception("Network unavailable");
         }
+        
+        // Simulate random transient failures (20% chance)
+        if (Math.random() < 0.2) {
+            throw new Exception("Transient server error");
+        }
+        
         return UUID.randomUUID().toString(); // Return mock remote ID
     }
 

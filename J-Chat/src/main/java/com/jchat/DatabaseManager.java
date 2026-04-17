@@ -36,10 +36,16 @@ public class DatabaseManager {
                 
                 try {
                     stmt.executeUpdate("ALTER TABLE messages ADD COLUMN remote_id TEXT");
-                } catch (SQLException ignored) {} // Column might already exist
+                } catch (SQLException ignored) {} 
                 try {
                     stmt.executeUpdate("ALTER TABLE messages ADD COLUMN synced INTEGER DEFAULT 0");
-                } catch (SQLException ignored) {} // Column might already exist
+                } catch (SQLException ignored) {}
+                try {
+                    stmt.executeUpdate("ALTER TABLE messages ADD COLUMN retry_count INTEGER DEFAULT 0");
+                } catch (SQLException ignored) {}
+                try {
+                    stmt.executeUpdate("ALTER TABLE messages ADD COLUMN last_error TEXT");
+                } catch (SQLException ignored) {}
 
                 // Create contacts table
                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS contacts (" +
@@ -57,6 +63,8 @@ public class DatabaseManager {
                         "entity_id TEXT, " +
                         "operation TEXT, " +
                         "payload TEXT, " +
+                        "retry_count INTEGER DEFAULT 0, " +
+                        "last_error TEXT, " +
                         "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)");
             }
         } catch (SQLException e) {

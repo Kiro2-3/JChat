@@ -84,13 +84,29 @@ public class ChatController {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setGraphic(null);
+                    setTooltip(null);
                 } else {
                     sender.setText(item.getSender());
                     message.setText(item.getContent());
                     timestamp.setText(item.getTimestamp());
-                    syncStatus.setText(item.isSynced() ? "✓" : "⌛");
-                    syncStatus.setFill(item.isSynced() ? javafx.scene.paint.Color.GREEN : javafx.scene.paint.Color.GRAY);
-                    message.setOpacity(item.isSynced() ? 1.0 : 0.6);
+                    
+                    if (item.isSynced()) {
+                        syncStatus.setText("✓");
+                        syncStatus.setFill(javafx.scene.paint.Color.GREEN);
+                        message.setOpacity(1.0);
+                        setTooltip(null);
+                    } else if (item.getRetryCount() >= 3) { // Use the same MAX_RETRIES constant logic
+                        syncStatus.setText("⚠");
+                        syncStatus.setFill(javafx.scene.paint.Color.RED);
+                        message.setOpacity(0.5);
+                        setTooltip(new javafx.scene.control.Tooltip("Failed to sync: " + item.getLastError()));
+                    } else {
+                        syncStatus.setText("⌛");
+                        syncStatus.setFill(javafx.scene.paint.Color.GRAY);
+                        message.setOpacity(0.6);
+                        setTooltip(null);
+                    }
+                    
                     String avatarUrl = item.getAvatarUrl();
                     if (avatarUrl != null && !avatarUrl.isBlank()) {
                         avatar.setImage(new Image(avatarUrl, true));

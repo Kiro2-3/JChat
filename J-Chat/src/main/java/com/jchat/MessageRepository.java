@@ -28,7 +28,9 @@ public class MessageRepository {
                         rs.getString("content"),
                         rs.getString("timestamp"),
                         null,
-                        rs.getInt("synced") == 1
+                        rs.getInt("synced") == 1,
+                        rs.getInt("retry_count"),
+                        rs.getString("last_error")
                 ));
             }
         } catch (SQLException e) {
