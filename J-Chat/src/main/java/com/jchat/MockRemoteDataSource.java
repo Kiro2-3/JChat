@@ -27,6 +27,14 @@ public class MockRemoteDataSource {
 
     public String pushMessage(Message message) throws Exception {
         simulateLatency();
+
+        // 1. Idempotency Check
+        String messageId = message.getId();
+        if (IdempotencyService.getInstance().isDuplicate(messageId)) {
+            System.out.println("Idempotency: Duplicate request detected for ID: " + messageId + ". Returning cached response.");
+            return IdempotencyService.getInstance().getCachedResponse(messageId);
+        }
+
         if (!NetworkService.getInstance().isOnline()) {
             throw new Exception("Network unavailable");
         }
@@ -36,7 +44,11 @@ public class MockRemoteDataSource {
             throw new Exception("Transient server error");
         }
         
-        return UUID.randomUUID().toString(); // Return mock remote ID
+        // 2. Process and Cache Result
+        String remoteId = "REM-" + UUID.randomUUID().toString();
+        IdempotencyService.getInstance().markProcessed(messageId, remoteId);
+
+        return remoteId;
     }
 
     private void simulateLatency() {
