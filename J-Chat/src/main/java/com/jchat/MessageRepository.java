@@ -40,18 +40,39 @@ public class MessageRepository {
     }
 
     public void sendMessage(String content) {
+        String messageId = java.util.UUID.randomUUID().toString();
         try (Connection conn = DatabaseManager.getConnection()) {
-            PreparedStatement ps = conn.prepareStatement("INSERT INTO messages (sender, content, synced) VALUES (?, ?, 0)");
-            ps.setString(1, "Me");
-            ps.setString(2, content);
-            ps.executeUpdate();
-            
-            // Trigger sync immediately if online
-            if (NetworkService.getInstance().isOnline()) {
-                new Thread(() -> {
-                    // In a real app, you'd trigger SyncService to process only this message
-                    // For now, we rely on the periodic SyncService task
-                }).start();
+            conn.setAutoCommit(false);
+            try {
+                // 1. Insert into messages table
+                PreparedStatement psMsg = conn.prepareStatement(
+                    "INSERT INTO messages (id, sender, content, synced) VALUES (?, ?, ?, 0)");
+                psMsg.setString(1, messageId);
+                psMsg.setString(2, "Me");
+                psMsg.setString(3, content);
+                psMsg.executeUpdate();
+
+                // 2. Insert into sync_queue table
+                PreparedStatement psQueue = conn.prepareStatement(
+                    "INSERT INTO sync_queue (entity_type, entity_id, operation) VALUES (?, ?, ?)",
+                    java.sql.Statement.RETURN_GENERATED_KEYS);
+                psQueue.setString(1, "MESSAGE");
+                psQueue.setString(2, messageId);
+                psQueue.setString(3, "SEND");
+                psQueue.executeUpdate();
+
+                ResultSet rs = psQueue.getGeneratedKeys();
+                if (rs.next()) {
+                    int queueId = rs.getInt(1);
+                    // 3. Notify SyncService
+                    SyncService.getInstance().addTask(new SyncService.SyncTask(
+                        queueId, "MESSAGE", messageId, "SEND", null, 0, System.currentTimeMillis()));
+                }
+
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
         } catch (SQLException e) {
             e.printStackTrace();
