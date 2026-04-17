@@ -58,27 +58,41 @@ public class ChatController {
             private final Text sender;
             private final Text message;
             private final Text timestamp;
-            private final Text syncStatus;
+            private final javafx.scene.control.Label syncIcon;
             {
                 avatar = new ImageView();
                 avatar.setFitWidth(36);
                 avatar.setFitHeight(36);
                 avatar.setStyle("-fx-background-radius: 18; -fx-effect: dropshadow(gaussian, #e0e0e0, 4, 0.2, 0, 1);");
+                
                 sender = new Text();
-                sender.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+                sender.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-fill: #555;");
+                
                 message = new Text();
-                message.setStyle("-fx-font-size: 16px;");
+                message.setStyle("-fx-font-size: 15px;");
+                message.setWrappingWidth(250);
+
                 timestamp = new Text();
-                timestamp.setStyle("-fx-font-size: 10px; -fx-fill: #888;");
-                syncStatus = new Text();
-                syncStatus.setStyle("-fx-font-size: 10px;");
-                HBox footer = new HBox(timestamp, syncStatus);
+                timestamp.setStyle("-fx-font-size: 10px; -fx-fill: #999;");
+                
+                syncIcon = new javafx.scene.control.Label();
+                syncIcon.setStyle("-fx-padding: 0 0 0 5;");
+
+                HBox footer = new HBox(timestamp, syncIcon);
+                footer.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
                 footer.setSpacing(5);
-                vbox = new VBox(sender, message, footer);
-                vbox.setSpacing(2);
+
+                VBox bubble = new VBox(sender, message, footer);
+                bubble.setSpacing(5);
+                bubble.setPadding(new javafx.geometry.Insets(8, 12, 8, 12));
+                bubble.setStyle("-fx-background-color: #f0f0f0; -fx-background-radius: 15;");
+
+                vbox = new VBox(bubble);
                 content = new HBox(avatar, vbox);
                 content.setSpacing(10);
+                content.setPadding(new javafx.geometry.Insets(5, 10, 5, 10));
             }
+
             @Override
             protected void updateItem(Message item, boolean empty) {
                 super.updateItem(item, empty);
@@ -90,23 +104,47 @@ public class ChatController {
                     message.setText(item.getContent());
                     timestamp.setText(item.getTimestamp());
                     
-                    if (item.isSynced()) {
-                        syncStatus.setText("✓");
-                        syncStatus.setFill(javafx.scene.paint.Color.GREEN);
-                        message.setOpacity(1.0);
-                        setTooltip(null);
-                    } else if (item.getRetryCount() >= 3) { // Use the same MAX_RETRIES constant logic
-                        syncStatus.setText("⚠");
-                        syncStatus.setFill(javafx.scene.paint.Color.RED);
-                        message.setOpacity(0.5);
-                        setTooltip(new javafx.scene.control.Tooltip("Failed to sync: " + item.getLastError()));
-                    } else {
-                        syncStatus.setText("⌛");
-                        syncStatus.setFill(javafx.scene.paint.Color.GRAY);
-                        message.setOpacity(0.6);
-                        setTooltip(null);
+                    SyncStatus status = item.getSyncStatus();
+                    syncIcon.setGraphic(null);
+                    
+                    switch (status) {
+                        case PENDING:
+                            syncIcon.setGraphic(MaterialDesignIcon.SCHEDULE.graphic());
+                            syncIcon.getGraphic().setStyle("-fx-fill: #999; -fx-font-size: 12px;");
+                            vbox.setOpacity(0.6);
+                            setTooltip(null);
+                            break;
+                        case SENT:
+                            syncIcon.setGraphic(MaterialDesignIcon.DONE.graphic());
+                            syncIcon.getGraphic().setStyle("-fx-fill: #4CAF50; -fx-font-size: 12px;");
+                            vbox.setOpacity(1.0);
+                            setTooltip(null);
+                            break;
+                        case DELIVERED:
+                            syncIcon.setGraphic(MaterialDesignIcon.DONE_ALL.graphic());
+                            syncIcon.getGraphic().setStyle("-fx-fill: #2196F3; -fx-font-size: 12px;");
+                            vbox.setOpacity(1.0);
+                            setTooltip(null);
+                            break;
+                        case FAILED:
+                            syncIcon.setGraphic(MaterialDesignIcon.REPORT_PROBLEM.graphic());
+                            syncIcon.getGraphic().setStyle("-fx-fill: #F44336; -fx-font-size: 12px;");
+                            vbox.setOpacity(0.5);
+                            setTooltip(new javafx.scene.control.Tooltip("Failed: " + item.getLastError()));
+                            break;
                     }
                     
+                    // Alignment logic: "Me" messages on the right
+                    if ("Me".equals(item.getSender())) {
+                        content.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+                        content.getChildren().setAll(vbox, avatar);
+                        vbox.getChildren().get(0).setStyle("-fx-background-color: #DCF8C6; -fx-background-radius: 15;");
+                    } else {
+                        content.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                        content.getChildren().setAll(avatar, vbox);
+                        vbox.getChildren().get(0).setStyle("-fx-background-color: #ffffff; -fx-background-radius: 15;");
+                    }
+
                     String avatarUrl = item.getAvatarUrl();
                     if (avatarUrl != null && !avatarUrl.isBlank()) {
                         avatar.setImage(new Image(avatarUrl, true));

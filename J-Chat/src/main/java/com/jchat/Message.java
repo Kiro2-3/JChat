@@ -47,4 +47,14 @@ public class Message {
     public void setSynced(boolean synced) { this.synced = synced; }
     public void setRetryCount(int retryCount) { this.retryCount = retryCount; }
     public void setLastError(String lastError) { this.lastError = lastError; }
+
+    public SyncStatus getSyncStatus() {
+        if (synced) {
+            return SyncStatus.SENT; // In a full app, you'd check a 'delivered' flag for DELIVERED
+        } else if (retryCount >= 3) {
+            return SyncStatus.FAILED;
+        } else {
+            return SyncStatus.PENDING;
+        }
+    }
 }
