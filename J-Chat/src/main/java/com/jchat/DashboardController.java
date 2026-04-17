@@ -19,6 +19,7 @@ import javafx.scene.text.Text;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 
 public class DashboardController {
 
@@ -30,6 +31,9 @@ public class DashboardController {
 
     @FXML
     private HBox connectivityBar;
+
+    @FXML
+    private TextField searchField;
 
     private final ObservableList<Contact> contacts = FXCollections.observableArrayList();
 
@@ -47,6 +51,15 @@ public class DashboardController {
         if (connectivityBar != null) {
             connectivityBar.visibleProperty().bind(NetworkService.getInstance().onlineProperty().not());
             connectivityBar.managedProperty().bind(connectivityBar.visibleProperty());
+        }
+
+        // Search Bar logic: Change prompt based on offline status
+        if (searchField != null) {
+            searchField.promptTextProperty().bind(
+                javafx.beans.binding.Bindings.when(NetworkService.getInstance().onlineProperty())
+                .then("Search messages...")
+                .otherwise("Searching local messages only")
+            );
         }
 
         // Initialize Services

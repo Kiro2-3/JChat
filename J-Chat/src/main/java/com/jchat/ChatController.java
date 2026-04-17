@@ -13,6 +13,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.animation.ScaleTransition;
+import javafx.util.Duration;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.gluonhq.charm.glisten.application.MobileApplication;
@@ -68,6 +70,9 @@ public class ChatController {
             private final Text timestamp;
             private final javafx.scene.control.Label syncIcon;
             private final javafx.scene.control.Button retryBtn;
+            private final ImageView mediaView;
+            private SyncStatus lastStatus = null;
+
             {
                 avatar = new ImageView();
                 avatar.setFitWidth(36);
@@ -80,6 +85,11 @@ public class ChatController {
                 message = new Text();
                 message.setStyle("-fx-font-size: 15px;");
                 message.setWrappingWidth(250);
+
+                mediaView = new ImageView();
+                mediaView.setFitWidth(200);
+                mediaView.setPreserveRatio(true);
+                mediaView.setStyle("-fx-background-radius: 10;");
 
                 timestamp = new Text();
                 timestamp.setStyle("-fx-font-size: 10px; -fx-fill: #999;");
@@ -96,7 +106,7 @@ public class ChatController {
                 footer.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
                 footer.setSpacing(5);
 
-                VBox bubble = new VBox(sender, message, footer);
+                VBox bubble = new VBox(sender, mediaView, message, footer);
                 bubble.setSpacing(5);
                 bubble.setPadding(new javafx.geometry.Insets(8, 12, 8, 12));
                 bubble.setStyle("-fx-background-color: #f0f0f0; -fx-background-radius: 15;");
@@ -107,18 +117,35 @@ public class ChatController {
                 content.setPadding(new javafx.geometry.Insets(5, 10, 5, 10));
             }
 
+            private void playPopAnimation() {
+                ScaleTransition st = new ScaleTransition(Duration.millis(300), syncIcon);
+                st.setFromX(0.5); st.setFromY(0.5);
+                st.setToX(1.2); st.setToY(1.2);
+                st.setCycleCount(2);
+                st.setAutoReverse(true);
+                st.play();
+            }
+
             @Override
             protected void updateItem(Message item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setGraphic(null);
                     setTooltip(null);
+                    lastStatus = null;
                 } else {
                     sender.setText(item.getSender());
                     message.setText(item.getContent());
                     timestamp.setText(item.getTimestamp());
                     
                     SyncStatus status = item.getSyncStatus();
+                    
+                    // Micro-interaction: Pop animation on status change to SENT
+                    if (lastStatus == SyncStatus.PENDING && status == SyncStatus.SENT) {
+                        playPopAnimation();
+                    }
+                    lastStatus = status;
+
                     syncIcon.setGraphic(null);
                     retryBtn.setVisible(false);
                     retryBtn.setManaged(false);
@@ -151,6 +178,23 @@ public class ChatController {
                             retryBtn.setManaged(true);
                             retryBtn.setOnAction(e -> retrySync(item.getId()));
                             break;
+                    }
+
+                    // Media Logic: Cloud-only vs Local
+                    if (item.getMediaUrl() != null) {
+                        mediaView.setVisible(true);
+                        mediaView.setManaged(true);
+                        if (item.isMediaDownloaded()) {
+                            mediaView.setImage(new Image(item.getMediaUrl(), true));
+                            mediaView.setOpacity(1.0);
+                        } else {
+                            // Cloud-only design: Blurred/Greyed out with cloud icon
+                            mediaView.setImage(new Image("https://via.placeholder.com/200x120?text=Cloud+Image", true));
+                            mediaView.setOpacity(0.4);
+                        }
+                    } else {
+                        mediaView.setVisible(false);
+                        mediaView.setManaged(false);
                     }
                     
                     // Alignment logic: "Me" messages on the right
