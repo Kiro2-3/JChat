@@ -54,7 +54,20 @@ public class DatabaseManager {
                         "lastMessage TEXT, " +
                         "status TEXT, " +
                         "avatarUrl TEXT, " +
-                        "synced INTEGER DEFAULT 1)");
+                        "synced INTEGER DEFAULT 1, " +
+                        "version INTEGER DEFAULT 1, " +
+                        "retry_count INTEGER DEFAULT 0, " +
+                        "last_error TEXT)");
+
+                try {
+                    stmt.executeUpdate("ALTER TABLE contacts ADD COLUMN version INTEGER DEFAULT 1");
+                } catch (SQLException ignored) {}
+                try {
+                    stmt.executeUpdate("ALTER TABLE contacts ADD COLUMN retry_count INTEGER DEFAULT 0");
+                } catch (SQLException ignored) {}
+                try {
+                    stmt.executeUpdate("ALTER TABLE contacts ADD COLUMN last_error TEXT");
+                } catch (SQLException ignored) {}
 
                 // Create sync_queue table
                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS sync_queue (" +

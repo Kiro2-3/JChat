@@ -8,8 +8,8 @@ import java.sql.SQLException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import java.util.concurrent.*;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ExecutorService;
 
 public class SyncService {
     private static final SyncService instance = new SyncService();
@@ -17,10 +17,19 @@ public class SyncService {
     private final ExecutorService workerExecutor = Executors.newSingleThreadExecutor();
     private static final int MAX_RETRIES = 3;
 
+    public interface ConflictResolutionListener {
+        void onConflict(SyncTask task, Contact localData, Contact serverData);
+    }
+
+    private ConflictResolutionListener conflictListener;
+
+    public void setConflictListener(ConflictResolutionListener listener) {
+        this.conflictListener = listener;
+    }
+
     private SyncService() {
         loadPendingTasksFromDb();
         startWorkerThread();
-        // Keep the periodic refresh for contacts
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(this::syncContacts, 0, 1, TimeUnit.MINUTES);
     }
@@ -33,13 +42,12 @@ public class SyncService {
         workerExecutor.submit(() -> {
             while (true) {
                 try {
-                    SyncTask task = taskQueue.take(); // Blocks until a task is available
+                    SyncTask task = taskQueue.take();
                     if (NetworkService.getInstance().isOnline()) {
                         processTask(task);
                     } else {
-                        // If offline, put it back or wait for network
                         taskQueue.put(task);
-                        Thread.sleep(5000); // Wait before retrying
+                        Thread.sleep(5000);
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -67,14 +75,12 @@ public class SyncService {
                         rs.getString("entity_id"),
                         rs.getString("operation"),
                         rs.getString("payload"),
-                        0, // Reset retry count
+                        0,
                         System.currentTimeMillis()
                 );
-                // Update DB as well
                 PreparedStatement psUpd = conn.prepareStatement("UPDATE sync_queue SET retry_count = 0, last_error = NULL WHERE id = ?");
                 psUpd.setInt(1, task.getQueueId());
                 psUpd.executeUpdate();
-                
                 addTask(task);
             }
         } catch (SQLException e) {
@@ -111,9 +117,78 @@ public class SyncService {
                     String remoteId = MockRemoteDataSource.getInstance().pushMessage(msg);
                     completeTask(task, remoteId);
                 }
+            } else if ("CONTACT".equals(task.getEntityType()) && "UPDATE".equals(task.getOperation())) {
+                Contact contact = getContactFromDb(task.getEntityId());
+                if (contact != null) {
+                    try {
+                        MockRemoteDataSource.getInstance().updateContact(contact);
+                        completeContactTask(task);
+                    } catch (ConflictException ce) {
+                        if (conflictListener != null) {
+                            Platform.runLater(() -> conflictListener.onConflict(task, contact, (Contact) ce.getServerVersion()));
+                        }
+                    }
+                }
             }
         } catch (Exception e) {
             handleTaskFailure(task, e.getMessage());
+        }
+    }
+
+    private Contact getContactFromDb(String id) throws SQLException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM contacts WHERE id = ?");
+            ps.setString(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new Contact(
+                        rs.getString("id"),
+                        rs.getString("name"),
+                        rs.getString("lastMessage"),
+                        rs.getString("status"),
+                        rs.getInt("synced") == 1,
+                        rs.getInt("version")
+                );
+            }
+        }
+        return null;
+    }
+
+    private void completeContactTask(SyncTask task) throws SQLException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                PreparedStatement ps1 = conn.prepareStatement("UPDATE contacts SET synced = 1 WHERE id = ?");
+                ps1.setString(1, task.getEntityId());
+                ps1.executeUpdate();
+
+                PreparedStatement ps2 = conn.prepareStatement("DELETE FROM sync_queue WHERE id = ?");
+                ps2.setInt(1, task.getQueueId());
+                ps2.executeUpdate();
+
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+        }
+    }
+
+    public void resolveConflict(SyncTask task, Contact resolvedContact) {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            PreparedStatement ps = conn.prepareStatement(
+                "UPDATE contacts SET name = ?, lastMessage = ?, status = ?, version = ?, synced = 0 WHERE id = ?");
+            ps.setString(1, resolvedContact.getName());
+            ps.setString(2, resolvedContact.getLastMessage());
+            ps.setString(3, resolvedContact.getStatus());
+            ps.setInt(4, resolvedContact.getVersion());
+            ps.setString(5, resolvedContact.getId());
+            ps.executeUpdate();
+            
+            task.setRetryCount(0);
+            addTask(task);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -169,11 +244,19 @@ public class SyncService {
             ps.setInt(3, task.getQueueId());
             ps.executeUpdate();
             
-            PreparedStatement psMsg = conn.prepareStatement("UPDATE messages SET retry_count = ?, last_error = ? WHERE id = ?");
-            psMsg.setInt(1, newRetryCount);
-            psMsg.setString(2, error);
-            psMsg.setString(3, task.getEntityId());
-            psMsg.executeUpdate();
+            if (task.getEntityType().equals("MESSAGE")) {
+                PreparedStatement psMsg = conn.prepareStatement("UPDATE messages SET retry_count = ?, last_error = ? WHERE id = ?");
+                psMsg.setInt(1, newRetryCount);
+                psMsg.setString(2, error);
+                psMsg.setString(3, task.getEntityId());
+                psMsg.executeUpdate();
+            } else if (task.getEntityType().equals("CONTACT")) {
+                PreparedStatement psContact = conn.prepareStatement("UPDATE contacts SET retry_count = ?, last_error = ? WHERE id = ?");
+                psContact.setInt(1, newRetryCount);
+                psContact.setString(2, error);
+                psContact.setString(3, task.getEntityId());
+                psContact.executeUpdate();
+            }
 
             if (newRetryCount < MAX_RETRIES) {
                 task.setRetryCount(newRetryCount);
@@ -210,39 +293,31 @@ public class SyncService {
         public int getRetryCount() { return retryCount; }
         public void setRetryCount(int retryCount) { this.retryCount = retryCount; }
 
-    @Override
+        @Override
         public int compareTo(SyncTask o) {
             return Long.compare(this.timestamp, o.timestamp);
         }
     }
 
-    /**
-     * Triggered by WorkManager or other platform-specific schedulers.
-     * Synchronizes everything in the queue if online.
-     */
     public void syncPendingChanges() {
         if (NetworkService.getInstance().isOnline()) {
-            System.out.println("Starting batch sync triggered by platform worker...");
-            // The worker thread in startWorkerThread already processes the taskQueue.
-            // Here we just ensure all DB tasks are loaded and the worker is processing.
             loadPendingTasksFromDb();
         }
     }
 
     private void syncContacts() {
-        // Simple sync: just fetch and replace for now
         try {
             var remoteContacts = MockRemoteDataSource.getInstance().fetchContacts();
             try (Connection conn = DatabaseManager.getConnection()) {
-                // This is a simplified sync logic
                 for (Contact c : remoteContacts) {
                     PreparedStatement ps = conn.prepareStatement(
-                        "INSERT OR REPLACE INTO contacts (id, name, lastMessage, status, avatarUrl, synced) VALUES (?, ?, ?, ?, ?, 1)");
+                        "INSERT OR REPLACE INTO contacts (id, name, lastMessage, status, avatarUrl, synced, version) VALUES (?, ?, ?, ?, ?, 1, ?)");
                     ps.setString(1, c.getId());
                     ps.setString(2, c.getName());
                     ps.setString(3, c.getLastMessage());
                     ps.setString(4, c.getStatus());
                     ps.setString(5, c.getAvatarUrl());
+                    ps.setInt(6, c.getVersion());
                     ps.executeUpdate();
                 }
             }

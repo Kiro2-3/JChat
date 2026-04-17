@@ -51,6 +51,16 @@ public class MockRemoteDataSource {
         return remoteId;
     }
 
+    public void updateContact(Contact localContact) throws Exception {
+        simulateLatency();
+        // Simulate a conflict if the name is "Alice Conflict"
+        if ("Alice Conflict".equals(localContact.getName())) {
+            Contact serverVersion = new Contact(localContact.getId(), "Alice Server", "Original Msg", "Online", true, 2);
+            throw new ConflictException("Conflict detected on server", serverVersion);
+        }
+        System.out.println("Contact updated on server successfully.");
+    }
+
     private void simulateLatency() {
         try {
             TimeUnit.MILLISECONDS.sleep(1000);

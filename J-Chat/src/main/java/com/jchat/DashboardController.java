@@ -4,6 +4,7 @@ import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
+import com.gluonhq.charm.glisten.control.Dialog;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -15,6 +16,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
+import javafx.application.Platform;
+import javafx.scene.control.Label;
+import javafx.scene.control.Button;
 
 public class DashboardController {
 
@@ -32,7 +36,7 @@ public class DashboardController {
     private void loadContacts() {
         new Thread(() -> {
             ObservableList<Contact> loaded = ContactRepository.getInstance().getContacts();
-            javafx.application.Platform.runLater(() -> {
+            Platform.runLater(() -> {
                 contacts.setAll(loaded);
             });
         }).start();
@@ -46,7 +50,7 @@ public class DashboardController {
         }
 
         // Initialize Services
-        SyncService.getInstance(); 
+        SyncService.getInstance().setConflictListener(this::onConflictDetected);
 
         dashboardView.showingProperty().addListener((obs, oldValue, newValue) -> {
             if (newValue) {
@@ -57,17 +61,21 @@ public class DashboardController {
                 appBar.getActionItems().add(MaterialDesignIcon.ACCOUNT_CIRCLE.button(e -> 
                     MobileApplication.getInstance().switchView(Main.PROFILE_VIEW)));
                 
-                // Add a toggle for online/offline mode for testing
+                // Toggle for online/offline mode
                 appBar.getActionItems().add(MaterialDesignIcon.WIFI.button(e -> {
                     NetworkService.getInstance().setOnline(!NetworkService.getInstance().isOnline());
                     System.out.println("Online: " + NetworkService.getInstance().isOnline());
                 }));
+
+                // Button to trigger a mock conflict for testing
+                appBar.getActionItems().add(MaterialDesignIcon.REPORT.button(e -> {
+                    Contact c = new Contact("1", "Alice Conflict", "Simulated Conflict", "Online", false, 1);
+                    ContactRepository.getInstance().updateContact(c);
+                }));
             }
         });
 
-        // Load contacts from repository
         loadContacts();
-
         contactListView.setItems(contacts);
         contactListView.setCellFactory(lv -> new ListCell<>() {
             private final HBox content;
@@ -83,19 +91,14 @@ public class DashboardController {
                 avatar.setFitHeight(50);
                 Circle clip = new Circle(25, 25, 25);
                 avatar.setClip(clip);
-
                 nameText = new Text();
                 nameText.getStyleClass().add("contact-name");
-
                 lastMsgText = new Text();
                 lastMsgText.getStyleClass().add("contact-last-msg");
-
                 statusCircle = new Circle(6);
                 statusCircle.getStyleClass().add("status-indicator");
-
                 textContainer = new VBox(nameText, lastMsgText);
                 textContainer.setSpacing(4);
-
                 content = new HBox(avatar, textContainer, new javafx.scene.layout.Region(), statusCircle);
                 content.setSpacing(15);
                 content.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
@@ -109,28 +112,68 @@ public class DashboardController {
                 if (empty || item == null) {
                     setGraphic(null);
                 } else {
-                    nameText.setText(item.getName());
+                    nameText.setText(item.getName() + (item.isSynced() ? "" : " ⌛"));
                     lastMsgText.setText(item.getLastMessage());
                     avatar.setImage(new Image(item.getAvatarUrl(), true));
-                    
-                    // Status color logic
                     statusCircle.setFill(switch (item.getStatus()) {
                         case "Online" -> javafx.scene.paint.Color.valueOf("#22c55e");
                         case "Busy" -> javafx.scene.paint.Color.valueOf("#ef4444");
                         default -> javafx.scene.paint.Color.valueOf("#9ca3af");
                     });
-
                     setGraphic(content);
                 }
             }
         });
 
-        // Navigate to chat on click
         contactListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 MobileApplication.getInstance().switchView(Main.MAIN_VIEW);
-                // In a real app, you'd pass the contact ID to the chat controller
             }
         });
+    }
+
+    private void onConflictDetected(SyncService.SyncTask task, Contact local, Contact server) {
+        Platform.runLater(() -> showConflictDialog(task, local, server));
+    }
+
+    private void showConflictDialog(SyncService.SyncTask task, Contact local, Contact server) {
+        Dialog<Button> dialog = new Dialog<>();
+        dialog.setTitleText("Merge Conflict Detected");
+        
+        VBox content = new VBox(15);
+        content.setPadding(new javafx.geometry.Insets(10));
+        content.getChildren().add(new Label("Data on the server has changed. Choose which version to keep:"));
+        
+        HBox comparison = new HBox(20);
+        
+        VBox localBox = new VBox(5, new Label("MY VERSION"), new Label("Name: " + local.getName()));
+        localBox.setStyle("-fx-background-color: #f0fdf4; -fx-padding: 10; -fx-border-color: #22c55e;");
+        
+        VBox serverBox = new VBox(5, new Label("SERVER VERSION"), new Label("Name: " + server.getName()));
+        serverBox.setStyle("-fx-background-color: #fef2f2; -fx-padding: 10; -fx-border-color: #ef4444;");
+        
+        comparison.getChildren().addAll(localBox, serverBox);
+        content.getChildren().add(comparison);
+        
+        dialog.setContent(content);
+        
+        Button keepLocal = new Button("Keep My Version");
+        keepLocal.setOnAction(e -> {
+            // Keep local version, but increment version to server's version + 1 to 'win' the next sync
+            Contact resolved = new Contact(local.getId(), local.getName(), local.getLastMessage(), local.getStatus(), false, server.getVersion() + 1);
+            SyncService.getInstance().resolveConflict(task, resolved);
+            dialog.hide();
+            loadContacts();
+        });
+        
+        Button useServer = new Button("Use Server Version");
+        useServer.setOnAction(e -> {
+            SyncService.getInstance().resolveConflict(task, server);
+            dialog.hide();
+            loadContacts();
+        });
+        
+        dialog.getButtons().addAll(keepLocal, useServer);
+        dialog.showAndWait();
     }
 }
