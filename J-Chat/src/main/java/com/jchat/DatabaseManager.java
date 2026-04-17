@@ -25,7 +25,39 @@ public class DatabaseManager {
     private static void initializeDatabase() {
         try (Connection conn = getConnection()) {
             try (Statement stmt = conn.createStatement()) {
-                stmt.executeUpdate("CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, sender TEXT, content TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)");
+                // Update messages table - Ensure columns exist for migration
+                stmt.executeUpdate("CREATE TABLE IF NOT EXISTS messages (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "remote_id TEXT, " +
+                        "sender TEXT, " +
+                        "content TEXT, " +
+                        "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+                        "synced INTEGER DEFAULT 0)");
+                
+                try {
+                    stmt.executeUpdate("ALTER TABLE messages ADD COLUMN remote_id TEXT");
+                } catch (SQLException ignored) {} // Column might already exist
+                try {
+                    stmt.executeUpdate("ALTER TABLE messages ADD COLUMN synced INTEGER DEFAULT 0");
+                } catch (SQLException ignored) {} // Column might already exist
+
+                // Create contacts table
+                stmt.executeUpdate("CREATE TABLE IF NOT EXISTS contacts (" +
+                        "id TEXT PRIMARY KEY, " +
+                        "name TEXT, " +
+                        "lastMessage TEXT, " +
+                        "status TEXT, " +
+                        "avatarUrl TEXT, " +
+                        "synced INTEGER DEFAULT 1)");
+
+                // Create sync_queue table
+                stmt.executeUpdate("CREATE TABLE IF NOT EXISTS sync_queue (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "entity_type TEXT, " +
+                        "entity_id TEXT, " +
+                        "operation TEXT, " +
+                        "payload TEXT, " +
+                        "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)");
             }
         } catch (SQLException e) {
             e.printStackTrace();

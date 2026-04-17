@@ -26,7 +26,19 @@ public class DashboardController {
 
     private final ObservableList<Contact> contacts = FXCollections.observableArrayList();
 
+    private void loadContacts() {
+        new Thread(() -> {
+            ObservableList<Contact> loaded = ContactRepository.getInstance().getContacts();
+            javafx.application.Platform.runLater(() -> {
+                contacts.setAll(loaded);
+            });
+        }).start();
+    }
+
     public void initialize() {
+        // Initialize Services
+        SyncService.getInstance(); 
+
         dashboardView.showingProperty().addListener((obs, oldValue, newValue) -> {
             if (newValue) {
                 AppBar appBar = MobileApplication.getInstance().getAppBar();
@@ -35,17 +47,17 @@ public class DashboardController {
                 appBar.getActionItems().clear();
                 appBar.getActionItems().add(MaterialDesignIcon.ACCOUNT_CIRCLE.button(e -> 
                     MobileApplication.getInstance().switchView(Main.PROFILE_VIEW)));
+                
+                // Add a toggle for online/offline mode for testing
+                appBar.getActionItems().add(MaterialDesignIcon.WIFI.button(e -> {
+                    NetworkService.getInstance().setOnline(!NetworkService.getInstance().isOnline());
+                    System.out.println("Online: " + NetworkService.getInstance().isOnline());
+                }));
             }
         });
 
-        // Mock contacts
-        contacts.addAll(
-            new Contact("Alice Smith", "See you at 5!", "Online"),
-            new Contact("Bob Johnson", "Thanks for the help!", "Offline"),
-            new Contact("Charlie Brown", "Sent a file.", "Online"),
-            new Contact("Diana Prince", "Let's catch up soon.", "Busy"),
-            new Contact("Ethan Hunt", "Mission accomplished.", "Online")
-        );
+        // Load contacts from repository
+        loadContacts();
 
         contactListView.setItems(contacts);
         contactListView.setCellFactory(lv -> new ListCell<>() {

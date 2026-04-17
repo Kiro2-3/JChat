@@ -58,6 +58,7 @@ public class ChatController {
             private final Text sender;
             private final Text message;
             private final Text timestamp;
+            private final Text syncStatus;
             {
                 avatar = new ImageView();
                 avatar.setFitWidth(36);
@@ -69,7 +70,11 @@ public class ChatController {
                 message.setStyle("-fx-font-size: 16px;");
                 timestamp = new Text();
                 timestamp.setStyle("-fx-font-size: 10px; -fx-fill: #888;");
-                vbox = new VBox(sender, message, timestamp);
+                syncStatus = new Text();
+                syncStatus.setStyle("-fx-font-size: 10px;");
+                HBox footer = new HBox(timestamp, syncStatus);
+                footer.setSpacing(5);
+                vbox = new VBox(sender, message, footer);
                 vbox.setSpacing(2);
                 content = new HBox(avatar, vbox);
                 content.setSpacing(10);
@@ -83,6 +88,9 @@ public class ChatController {
                     sender.setText(item.getSender());
                     message.setText(item.getContent());
                     timestamp.setText(item.getTimestamp());
+                    syncStatus.setText(item.isSynced() ? "✓" : "⌛");
+                    syncStatus.setFill(item.isSynced() ? javafx.scene.paint.Color.GREEN : javafx.scene.paint.Color.GRAY);
+                    message.setOpacity(item.isSynced() ? 1.0 : 0.6);
                     String avatarUrl = item.getAvatarUrl();
                     if (avatarUrl != null && !avatarUrl.isBlank()) {
                         avatar.setImage(new Image(avatarUrl, true));
@@ -102,33 +110,14 @@ public class ChatController {
         if (content == null || content.isBlank()) return;
         messageField.clear();
         new Thread(() -> {
-            try (Connection conn = DatabaseManager.getConnection()) {
-                PreparedStatement ps = conn.prepareStatement("INSERT INTO messages (sender, content) VALUES (?, ?)");
-                ps.setString(1, "Me");
-                ps.setString(2, content);
-                ps.executeUpdate();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            MessageRepository.getInstance().sendMessage(content);
             Platform.runLater(this::loadMessages);
         }).start();
     }
 
     private void loadMessages() {
         new Thread(() -> {
-            ObservableList<Message> loaded = FXCollections.observableArrayList();
-            try (Connection conn = DatabaseManager.getConnection()) {
-                ResultSet rs = conn.createStatement().executeQuery("SELECT sender, content, timestamp FROM messages ORDER BY timestamp ASC");
-                while (rs.next()) {
-                    String sender = rs.getString("sender");
-                    String content = rs.getString("content");
-                    String timestamp = rs.getString("timestamp");
-                    // For now, use null for avatarUrl (default avatar)
-                    loaded.add(new Message(sender, content, timestamp, null));
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            ObservableList<Message> loaded = MessageRepository.getInstance().getMessages();
             Platform.runLater(() -> {
                 messages.setAll(loaded);
                 messagesListView.scrollTo(messages.size() - 1);
