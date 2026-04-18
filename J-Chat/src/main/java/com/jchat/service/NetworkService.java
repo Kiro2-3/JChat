@@ -1,4 +1,4 @@
-package com.jchat;
+package com.jchat.service;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;

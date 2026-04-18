@@ -1,4 +1,4 @@
-package com.jchat;
+package com.jchat.model;
 
 public class Item {
     private int id;

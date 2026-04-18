@@ -1,4 +1,4 @@
-package com.jchat;
+package com.jchat.repository;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

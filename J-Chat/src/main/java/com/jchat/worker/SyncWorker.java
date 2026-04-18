@@ -4,7 +4,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
-import com.jchat.SyncService;
+import com.jchat.service.SyncService;
 
 public class SyncWorker extends Worker {
 

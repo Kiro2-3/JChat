@@ -1,4 +1,4 @@
-package com.jchat;
+package com.jchat.controller;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;

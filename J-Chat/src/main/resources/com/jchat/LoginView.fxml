@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Text?>
 <?import com.gluonhq.charm.glisten.control.AppBar?>
 
-<VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jchat.LoginController" 
+<VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jchat.controller.LoginController" 
       alignment="CENTER" spacing="0" fillWidth="true" styleClass="login-container" stylesheets="@style.css">
     <children>
         <AppBar fx:id="appBar" />

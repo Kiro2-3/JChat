@@ -1,4 +1,4 @@
-package com.jchat;
+package com.jchat.model;
 
 public enum SyncStatus {
     PENDING,

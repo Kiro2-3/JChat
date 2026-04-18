@@ -7,7 +7,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.geometry.Insets?>
 
-<View fx:id="profileView" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jchat.ProfileController" styleClass="profile-container" stylesheets="@style.css">
+<View fx:id="profileView" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jchat.controller.ProfileController" styleClass="profile-container" stylesheets="@style.css">
     <center>
         <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
             <content>
