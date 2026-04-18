@@ -84,6 +84,10 @@ public class DashboardController {
                     System.out.println("Online: " + nowOnline);
                 }));
 
+                // Marketplace navigation
+                appBar.getActionItems().add(MaterialDesignIcon.SHOPPING_CART.button(e -> 
+                    MobileApplication.getInstance().switchView(Main.MARKETPLACE_VIEW)));
+
                 // Button to trigger a mock conflict for testing
                 appBar.getActionItems().add(MaterialDesignIcon.REPORT.button(e -> {
                     Contact c = new Contact("1", "Alice Conflict", "Simulated Conflict", "Online", false, 1);

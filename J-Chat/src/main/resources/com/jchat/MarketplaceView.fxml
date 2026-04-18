@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.gluonhq.charm.glisten.mvc.View?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.VBox?>
+
+<View fx:id="marketplaceView" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jchat.MarketplaceController">
+    <center>
+        <VBox>
+            <ListView fx:id="itemListView" VBox.vgrow="ALWAYS" />
+        </VBox>
+    </center>
+</View>

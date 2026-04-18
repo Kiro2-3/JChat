@@ -79,6 +79,14 @@ public class DatabaseManager {
                         "retry_count INTEGER DEFAULT 0, " +
                         "last_error TEXT, " +
                         "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)");
+
+                // Create items table
+                stmt.executeUpdate("CREATE TABLE IF NOT EXISTS items (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "title TEXT, " +
+                        "description TEXT, " +
+                        "type TEXT, " + // "SELL" or "WANTED"
+                        "timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)");
             }
         } catch (SQLException e) {
             e.printStackTrace();

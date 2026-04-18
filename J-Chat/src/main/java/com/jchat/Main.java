@@ -13,6 +13,7 @@ public class Main extends MobileApplication {
     public static final String LOGIN_VIEW = "LoginView";
     public static final String PROFILE_VIEW = "ProfileView";
     public static final String DASHBOARD_VIEW = "DashboardView";
+    public static final String MARKETPLACE_VIEW = "MarketplaceView";
 
     @Override
     public void init() {
@@ -30,6 +31,17 @@ public class Main extends MobileApplication {
         addViewFactory(DASHBOARD_VIEW, () -> {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jchat/DashboardView.fxml"));
+                Parent root = loader.load();
+                return (View) root;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new View();
+            }
+        });
+
+        addViewFactory(MARKETPLACE_VIEW, () -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jchat/MarketplaceView.fxml"));
                 Parent root = loader.load();
                 return (View) root;
             } catch (Exception e) {
