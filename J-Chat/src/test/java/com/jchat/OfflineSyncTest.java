@@ -1,4 +1,4 @@
-package com.jchat;
+package com.reloved;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
