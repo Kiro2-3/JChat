@@ -34,15 +34,17 @@ public class ItemRepository {
         return items;
     }
 
-    public void addItem(String title, String description, String type) {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            PreparedStatement ps = conn.prepareStatement("INSERT INTO items (title, description, type) VALUES (?, ?, ?)");
+    public boolean addItem(String title, String description, String type) {
+        String query = "INSERT INTO items (title, description, type) VALUES (?, ?, ?)";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setString(1, title);
             ps.setString(2, description);
             ps.setString(3, type);
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 }

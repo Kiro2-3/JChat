@@ -61,6 +61,21 @@ public class MarketplaceController {
         });
     }
 
+    // Helper method to safely add an item
+    public void postItem(String title, String description, String type) {
+        if (title == null || title.isBlank() || description == null || description.isBlank()) {
+            new Toast("Title and description are required").show();
+            return;
+        }
+        
+        if (ItemRepository.getInstance().addItem(title, description, type)) {
+            new Toast("Item posted successfully!").show();
+            loadItems();
+        } else {
+            new Toast("Failed to post item").show();
+        }
+    }
+
     private void loadItems() {
         try {
             items.setAll(ItemRepository.getInstance().getItems());
