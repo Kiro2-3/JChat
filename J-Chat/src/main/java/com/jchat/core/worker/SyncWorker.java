@@ -1,4 +1,4 @@
-package com.jchat.worker;
+package com.jchat.core.worker;
 
 import android.content.Context;
 import androidx.annotation.NonNull;

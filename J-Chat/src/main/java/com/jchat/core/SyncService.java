@@ -1,4 +1,4 @@
-package com.jchat.service;
+package com.jchat.core;
 
 import com.gluonhq.charm.glisten.control.Toast;
 import javafx.application.Platform;

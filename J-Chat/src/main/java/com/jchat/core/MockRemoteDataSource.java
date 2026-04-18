@@ -1,4 +1,4 @@
-package com.jchat.data;
+package com.jchat.core;
 
 import java.util.ArrayList;
 import java.util.List;

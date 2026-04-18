@@ -1,4 +1,4 @@
-package com.jchat.controller;
+package com.jchat.core;
 
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.control.AppBar;

@@ -1,4 +1,4 @@
-package com.jchat.model;
+package com.jchat.contacts;
 
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package com.jchat.model;
+package com.jchat.marketplace;
 
 public class Item {
     private int id;

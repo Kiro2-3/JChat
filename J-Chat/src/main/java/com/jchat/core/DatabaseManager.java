@@ -1,4 +1,4 @@
-package com.jchat.data;
+package com.jchat.core;
 
 import com.gluonhq.attach.storage.StorageService;
 import com.gluonhq.attach.util.Services;

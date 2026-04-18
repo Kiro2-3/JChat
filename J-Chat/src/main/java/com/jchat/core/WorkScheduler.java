@@ -1,4 +1,4 @@
-package com.jchat.worker;
+package com.jchat.core;
 
 import android.content.Context;
 import androidx.work.Constraints;
