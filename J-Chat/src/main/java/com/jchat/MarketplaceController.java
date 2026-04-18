@@ -2,6 +2,7 @@ package com.jchat;
 
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.control.AppBar;
+import com.gluonhq.charm.glisten.control.Toast;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import javafx.collections.FXCollections;
@@ -61,6 +62,10 @@ public class MarketplaceController {
     }
 
     private void loadItems() {
-        items.setAll(ItemRepository.getInstance().getItems());
+        try {
+            items.setAll(ItemRepository.getInstance().getItems());
+        } catch (Exception e) {
+            new Toast("Failed to load items from marketplace.").show();
+        }
     }
 }
