@@ -2,6 +2,7 @@ package com.jchat;
 
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.control.AppBar;
+import com.gluonhq.charm.glisten.control.Toast;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -38,13 +39,13 @@ public class LoginController {
         String password = passwordField.getText();
 
         if (username == null || username.isBlank()) {
-            errorLabel.setText("Please enter your username.");
+            showError("Please enter your username.");
             usernameField.requestFocus();
             return;
         }
 
         if (password == null || password.isBlank()) {
-            errorLabel.setText("Please enter your password.");
+            showError("Please enter your password.");
             passwordField.requestFocus();
             return;
         }
@@ -60,6 +61,13 @@ public class LoginController {
 
     @FXML
     private void onRegister() {
-        errorLabel.setText("Registration is coming soon!");
+        Toast toast = new Toast("Registration is coming soon!");
+        toast.show();
+    }
+
+    private void showError(String message) {
+        errorLabel.setText(message);
+        Toast toast = new Toast(message);
+        toast.show();
     }
 }

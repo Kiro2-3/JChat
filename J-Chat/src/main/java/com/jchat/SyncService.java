@@ -1,5 +1,6 @@
 package com.jchat;
 
+import com.gluonhq.charm.glisten.control.Toast;
 import javafx.application.Platform;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -237,6 +238,9 @@ public class SyncService {
 
     private void handleTaskFailure(SyncTask task, String error) {
         int newRetryCount = task.getRetryCount() + 1;
+        Platform.runLater(() -> {
+            new Toast("Sync failed for " + task.getEntityType().toLowerCase() + ": " + error).show();
+        });
         try (Connection conn = DatabaseManager.getConnection()) {
             PreparedStatement ps = conn.prepareStatement("UPDATE sync_queue SET retry_count = ?, last_error = ? WHERE id = ?");
             ps.setInt(1, newRetryCount);

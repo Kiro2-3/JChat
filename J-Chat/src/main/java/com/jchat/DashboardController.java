@@ -2,6 +2,7 @@ package com.jchat;
 
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.control.AppBar;
+import com.gluonhq.charm.glisten.control.Toast;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.gluonhq.charm.glisten.control.Dialog;
@@ -76,8 +77,11 @@ public class DashboardController {
                 
                 // Toggle for online/offline mode
                 appBar.getActionItems().add(MaterialDesignIcon.WIFI.button(e -> {
-                    NetworkService.getInstance().setOnline(!NetworkService.getInstance().isOnline());
-                    System.out.println("Online: " + NetworkService.getInstance().isOnline());
+                    boolean nowOnline = !NetworkService.getInstance().isOnline();
+                    NetworkService.getInstance().setOnline(nowOnline);
+                    Toast toast = new Toast(nowOnline ? "Back Online" : "Working Offline");
+                    toast.show();
+                    System.out.println("Online: " + nowOnline);
                 }));
 
                 // Button to trigger a mock conflict for testing

@@ -16,6 +16,7 @@ import javafx.scene.text.Text;
 import javafx.animation.ScaleTransition;
 import javafx.util.Duration;
 import com.gluonhq.charm.glisten.control.AppBar;
+import com.gluonhq.charm.glisten.control.Toast;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 
@@ -222,6 +223,7 @@ public class ChatController {
     }
 
     private void retrySync(String messageId) {
+        new Toast("Retrying synchronization...").show();
         new Thread(() -> {
             SyncService.getInstance().retryTask(messageId);
             Platform.runLater(this::loadMessages);
@@ -231,7 +233,10 @@ public class ChatController {
     @FXML
     private void onSend() {
         String content = messageField.getText();
-        if (content == null || content.isBlank()) return;
+        if (content == null || content.isBlank()) {
+            new Toast("Cannot send empty message").show();
+            return;
+        }
         messageField.clear();
         new Thread(() -> {
             MessageRepository.getInstance().sendMessage(content);

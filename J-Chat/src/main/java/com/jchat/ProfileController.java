@@ -2,6 +2,7 @@ package com.jchat;
 
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.control.AppBar;
+import com.gluonhq.charm.glisten.control.Toast;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import javafx.fxml.FXML;
@@ -51,11 +52,13 @@ public class ProfileController {
 
     @FXML
     private void onEditProfile() {
+        new Toast("Profile editing is not yet implemented.").show();
         System.out.println("Edit profile clicked");
     }
 
     @FXML
     private void onLogout() {
+        new Toast("Logging out...").show();
         MobileApplication.getInstance().switchView(Main.LOGIN_VIEW);
     }
 }
