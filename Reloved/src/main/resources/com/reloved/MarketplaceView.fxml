@@ -4,7 +4,7 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.VBox?>
 
-<View fx:id="marketplaceView" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.reloved.controller.MarketplaceController">
+<View fx:id="marketplaceView" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.reloved.marketplace.MarketplaceController">
     <center>
         <VBox>
             <ListView fx:id="itemListView" VBox.vgrow="ALWAYS" />

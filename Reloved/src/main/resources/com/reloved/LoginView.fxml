@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Text?>
 <?import com.gluonhq.charm.glisten.control.AppBar?>
 
-<VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.reloved.controller.LoginController" 
+<VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.reloved.auth.LoginController" 
       alignment="CENTER" spacing="0" fillWidth="true" styleClass="login-container" stylesheets="@style.css">
     <children>
         <AppBar fx:id="appBar" />
@@ -20,7 +20,7 @@
                         </StackPane>
                         <VBox alignment="CENTER" spacing="5">
                             <Text text="Welcome Back" styleClass="header-text" />
-                            <Text text="Sign in to your JChat account" styleClass="sub-header-text" />
+                            <Text text="Sign in to your Reloved account" styleClass="sub-header-text" />
                         </VBox>
                     </VBox>
 

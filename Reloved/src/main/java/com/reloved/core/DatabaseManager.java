@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DatabaseManager {
-    private static final String DB_NAME = "jchat.db";
+    private static final String DB_NAME = "reloved.db";
     private static Path dbPath;
 
     static {

@@ -19,7 +19,7 @@ public class Main extends MobileApplication {
     public void init() {
         addViewFactory(LOGIN_VIEW, () -> {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jchat/LoginView.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/reloved/LoginView.fxml"));
                 Parent root = loader.load();
                 return new View(root);
             } catch (Exception e) {
@@ -30,7 +30,7 @@ public class Main extends MobileApplication {
 
         addViewFactory(DASHBOARD_VIEW, () -> {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jchat/DashboardView.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/reloved/DashboardView.fxml"));
                 Parent root = loader.load();
                 return (View) root;
             } catch (Exception e) {
@@ -41,7 +41,7 @@ public class Main extends MobileApplication {
 
         addViewFactory(MARKETPLACE_VIEW, () -> {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jchat/MarketplaceView.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/reloved/MarketplaceView.fxml"));
                 Parent root = loader.load();
                 return (View) root;
             } catch (Exception e) {
@@ -52,7 +52,7 @@ public class Main extends MobileApplication {
 
         addViewFactory(MAIN_VIEW, () -> {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jchat/MainView.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/reloved/MainView.fxml"));
                 Parent root = loader.load();
                 return new View(root);
             } catch (Exception e) {
@@ -63,7 +63,7 @@ public class Main extends MobileApplication {
 
         addViewFactory(PROFILE_VIEW, () -> {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jchat/ProfileView.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/reloved/ProfileView.fxml"));
                 Parent root = loader.load();
                 return (View) root;
             } catch (Exception e) {

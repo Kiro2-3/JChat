@@ -1,4 +1,4 @@
-module com.jchat {
+module com.reloved {
     requires javafx.controls;
     requires javafx.fxml;
     requires com.gluonhq.attach.storage;
@@ -6,6 +6,6 @@ module com.jchat {
     requires com.gluonhq.charm.glisten;
     requires java.sql;
 
-    opens com.jchat to javafx.fxml, com.gluonhq.charm.glisten, gluonhq.ignite;
-    exports com.jchat;
+    opens com.reloved to javafx.fxml, com.gluonhq.charm.glisten, gluonhq.ignite;
+    exports com.reloved;
 }

@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import com.gluonhq.charm.glisten.control.AppBar?>
-<VBox fx:id="mainView" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jchat.ChatController" spacing="0" fillWidth="true" style="-fx-background-color: #f4f6fb; -fx-padding: 0;">
+<VBox fx:id="mainView" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.reloved.chat.ChatController" spacing="0" fillWidth="true" style="-fx-background-color: #f4f6fb; -fx-padding: 0;">
     <children>
         <AppBar fx:id="appBar" />
         <HBox fx:id="connectivityBar" styleClass="connectivity-bar" managed="false" visible="false">

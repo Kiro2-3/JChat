@@ -1,4 +1,4 @@
-# Reloved (J-Chat): Social Marketplace Messenger
+# Reloved: Social Marketplace Messenger
 
 Reloved is a cross-platform social marketplace application built with **JavaFX** and **Gluon**. It combines real-time messaging with a local marketplace, allowing users to chat, sell items, and search for products in their vicinity. 
 
@@ -36,12 +36,12 @@ Reloved is designed to be fully functional without an active internet connection
 ## Installation & Setup
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/Kiro2-3/JChat.git
-   cd JChat
+   git clone https://github.com/Kiro2-3/Reloved.git
+   cd Reloved
    ```
 2. **Build the project**:
    ```bash
-   cd J-Chat
+   cd Reloved
    mvn clean install
    ```
 

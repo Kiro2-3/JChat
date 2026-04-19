@@ -25,11 +25,11 @@ public class WorkScheduler {
                             .build();
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-                    "JChatSync",
+                    "RelovedSync",
                     ExistingPeriodicWorkPolicy.KEEP,
                     syncRequest
             );
-            System.out.println("JChatSync scheduled successfully.");
+            System.out.println("RelovedSync scheduled successfully.");
         } catch (Exception e) {
             System.err.println("Failed to schedule work (likely not running on Android): " + e.getMessage());
         }

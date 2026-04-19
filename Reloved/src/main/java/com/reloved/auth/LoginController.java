@@ -29,7 +29,7 @@ public class LoginController {
     @FXML
     public void initialize() {
         if (appBar != null) {
-            appBar.setTitleText("Login to JChat");
+            appBar.setTitleText("Login to Reloved");
         }
     }
 

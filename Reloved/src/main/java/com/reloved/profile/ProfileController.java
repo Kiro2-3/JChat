@@ -42,7 +42,7 @@ public class ProfileController {
         // Mock data for now
         usernameLabel.setText("John Doe");
         emailLabel.setText("john.doe@example.com");
-        bioLabel.setText("Passionate developer and JChat enthusiast. Love building cross-platform apps!");
+        bioLabel.setText("Passionate developer and Reloved enthusiast. Love building cross-platform apps!");
         
         // Circular avatar
         Circle clip = new Circle(60, 60, 60);
