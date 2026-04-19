@@ -1,83 +1,98 @@
-# Reloved: Social Marketplace Messenger
+# Reloved (J-Chat): Social Marketplace Messenger
 
-Reloved is a cross-platform social marketplace application built with JavaFX and Gluon. It combines real-time messaging with a local marketplace, allowing users to chat, sell their items, and search for products they need. Reloved leverages a single Java codebase to target Windows, macOS, Android, and iOS using GraalVM.
+Reloved is a cross-platform social marketplace application built with **JavaFX** and **Gluon**. It combines real-time messaging with a local marketplace, allowing users to chat, sell items, and search for products in their vicinity. 
 
-## 🚀 Features
-* **Real-time Messaging**: Low-latency communication for seamless chats.
-* **Integrated Marketplace**: Post items for sale or request items you are looking for.
-* **Modern UI**: Styled for a native feel across desktop and mobile.
-* **Offline-First Architecture**: Robust local-first data management using SQLite and background synchronization.
+Built with a focus on reliability, Reloved utilizes an **Offline-First** architecture to ensure a seamless experience even in unstable network conditions.
 
 ---
 
-## 📱 Offline-First Capabilities
+## Key Features
+* **Real-time Messaging**: Low-latency communication with instant local feedback.
+* **Integrated Marketplace**: Browse, post, and manage items for sale.
+* **Modern UI**: Powered by Gluon Glisten for a native feel on Android, iOS, and Desktop.
+* **Robust Offline Sync**: Automatic synchronization of messages and marketplace actions using a background sync queue and idempotency keys.
 
-Reloved is designed to work seamlessly in unstable network conditions.
+---
+
+## Technical Architecture (Offline-First)
+
+Reloved is designed to be fully functional without an active internet connection.
 
 ### How it Works
-1. **Local-First**: All data (messages, contacts, marketplace items) is first persisted to a local SQLite database via the `Repository` layer.
-2. **Background Sync**: The `SyncService` ensures local changes are synchronized with the server when a network connection is available.
-3. **Visual Feedback**: The app uses toast notifications to inform users of actions, sync failures, or connectivity status changes.
+1. **Local-First Persistence**: Every action (sending a message, listing an item) is first committed to a local **SQLite** database via the Repository layer.
+2. **Sync Queue**: Pending changes are added to a `sync_queue` table with a unique idempotency ID.
+3. **Background Synchronization**: 
+    - The `SyncService` monitors network connectivity via `NetworkService`.
+    - When online, the `SyncWorker` processes the queue, ensuring each action is successfully delivered to the remote server exactly once.
+4. **Idempotency**: All network requests include an idempotency key to prevent duplicate entries (e.g., sending the same message twice) during retries.
 
 ---
 
-## 🛠 Prerequisites
-Ensure you have the following installed:
+## Prerequisites
 * **Java Development Kit (JDK) 21**
-* **Maven**
+* **Maven 3.9+**
+* (Optional) **GraalVM** for native mobile/desktop image compilation.
 
-## 📥 Installation & Setup
+## Installation & Setup
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/Kiro2-3/JChat.git
-   cd Reloved
+   cd JChat
    ```
-2. **Install dependencies**:
+2. **Build the project**:
    ```bash
    cd J-Chat
-   mvn install
+   mvn clean install
    ```
 
-## 💻 How to Run
-### 1. Run on Desktop
+## How to Run
+### Desktop (Hot Reload / Debug)
 ```bash
 mvn gluonfx:run
 ```
 
----
-
-## 📂 Project Structure (Feature-Centric)
-* `com.reloved`: Application root.
-  * `auth/`: Login and authentication logic.
-  * `chat/`: Messaging features and conversation management.
-  * `marketplace/`: Items, listings, and selling/buying interface.
-  * `contacts/`: Contact list management.
-  * `profile/`: User profile management.
-  * `core/`: Shared services (Sync, Network, Database, Background workers).
+### Native Build (Windows/macOS/Linux)
+```bash
+mvn gluonfx:build
+mvn gluonfx:install
+```
 
 ---
 
-## 🤝 Development Guidelines
-
-### 1. Feature Isolation
-New features should be contained within their own package (e.g., `com.reloved.newfeature`).
-
-### 2. Repository Pattern
-Always use the Repository Pattern for data access to decouple UI from data sources.
-
-### 3. UI Feedback
-Utilize the built-in `Toast` notification system for user-facing feedback, errors, and success confirmations.
-
-### 4. Contribution Workflow
-1. Create a feature branch.
-2. Implement your feature and ensure it follows the modular structure.
-3. Verify changes locally.
-4. Open a Pull Request.
+## Testing
+The project includes a comprehensive test suite for verifying the sync logic under various network conditions.
+To run the tests:
+```bash
+mvn test
+```
+The primary test suite is located in `src/test/java/com/reloved/OfflineSyncTest.java`.
 
 ---
 
-## 🛠 Built With
-* [JavaFX](https://openjfx.io/)
-* [GluonFX](https://gluonhq.com/products/mobile/)
-* [GraalVM](https://www.graalvm.org/)
-* [SQLite](https://www.sqlite.org/)
+## Project Structure
+* `com.reloved.auth`: Authentication and session management.
+* `com.reloved.chat`: Messaging, conversation logic, and `MessageRepository`.
+* `com.reloved.marketplace`: Item listings, categories, and `ItemRepository`.
+* `com.reloved.core`: 
+    - `DatabaseManager`: SQLite connection and schema management.
+    - `SyncService`: Core logic for managing the sync queue.
+    - `NetworkService`: Real-time network status monitoring.
+    - `WorkScheduler`: Platform-specific background task scheduling (e.g., Android WorkManager).
+
+---
+
+## Built With
+* [JavaFX](https://openjfx.io/) - UI Framework.
+* [GluonFX](https://gluonhq.com/products/mobile/) - Mobile & Native compilation.
+* [SQLite](https://www.sqlite.org/) - Local persistence.
+* [Charm Glisten](https://gluonhq.com/products/mobile/glisten/) - Material Design components.
+
+---
+
+## Contribution
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feature/amazing-feature`).
+3. Ensure your changes follow the **Repository Pattern** and maintain **Offline-First** compatibility.
+4. Commit your changes (`git commit -m 'Add amazing feature'`).
+5. Push to the branch (`git push origin feature/amazing-feature`).
+6. Open a Pull Request.
